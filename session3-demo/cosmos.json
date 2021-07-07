@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": { 
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "secondLocation": {
+            "type": "string",
+            "defaultValue": "eastus",
+            "metadata": {
+                "description": "secondary location for resources"
+            }
+        },
+        "cosmosDbName": { "type" : "string", "defaultValue": "pfregistrycosmosdb"}
+    },
+    "variables": {},
+    "resources": [
+                {
+            "apiVersion": "2019-12-12",
+            "kind": "GlobalDocumentDB",
+            "type": "Microsoft.DocumentDb/databaseAccounts",
+            "name": "[parameters('cosmosDbName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "databaseAccountOfferType": "Standard",
+                "locations": [
+                    {
+                        "id": "[concat(parameters('cosmosDbName'), '-', parameters('secondLocation'))]",
+                        "failoverPriority": 0,
+                        "locationName": "[parameters('secondLocation')]"
+                    }
+                ],
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "ipRangeFilter": "",
+                "dependsOn": [],
+                "capabilities": [
+                    {
+                        "name": "EnableCassandra"
+                    }
+                ],
+                "enableFreeTier": true
+            },
+            "tags": {
+                "defaultExperience": "Cassandra",
+                "hidden-cosmos-mmspecial": "",
+                "CosmosAccountType": "Non-Production"
+            }
+        }
+    ]
+}
